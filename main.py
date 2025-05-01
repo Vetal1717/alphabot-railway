@@ -14,16 +14,16 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
-    print("Received:", data)
+    print("📥 Получено сообщение:", data)
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
         text = data["message"].get("text", "")
 
         if text == "/start":
-            reply = "Привет! Я бот AlphaSignals. Готов к работе."
+            reply = "👋 Привет! Я бот AlphaSignals. Готов к работе."
         else:
-            reply = f"Ты написал: {text}"
+            reply = f"📨 Ты написал: {text}"
 
         send_message(chat_id, reply)
 
@@ -36,4 +36,5 @@ def send_message(chat_id, text):
         "text": text
     }
     response = requests.post(url, json=payload)
-    print("Sent message:", response.text)
+    print("📤 Отправка сообщения:", payload)
+    print("📡 Ответ Telegram:", response.status_code, response.text)
