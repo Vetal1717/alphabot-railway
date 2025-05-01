@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -27,7 +27,7 @@ def webhook():
 
         send_message(chat_id, reply)
 
-    return jsonify(ok=True), 200
+    return {"ok": True}, 200
 
 def send_message(chat_id, text):
     url = f"{TELEGRAM_API_URL}/sendMessage"
@@ -36,5 +36,4 @@ def send_message(chat_id, text):
         "text": text
     }
     response = requests.post(url, json=payload)
-    print("Sent:", response.text)
-
+    print("Sent message:", response.text)
