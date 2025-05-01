@@ -2,7 +2,7 @@ import os
 import requests
 from flask import Flask, request
 
-app = Flask(__name__)  # Обязательно оставить эту переменную
+app = Flask(__name__)
 
 TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
@@ -18,7 +18,7 @@ def webhook():
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
-        text = data["message"].get("text", "")
+        text = data["message"]["text"]
 
         if text == "/start":
             reply = "Привет! Я бот AlphaSignals. Готов к работе."
