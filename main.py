@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
@@ -9,25 +9,25 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 @app.route("/", methods=["GET"])
 def home():
-    return "AlphaBot is live!", 200
+    return "AlphaBot is running", 200
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
-    print("📥 Получено сообщение:", data)
+    print("Received:", data)
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
         text = data["message"].get("text", "")
 
         if text == "/start":
-            reply = "👋 Привет! Я бот AlphaSignals. Готов к работе."
+            reply = "Привет! Я бот AlphaSignals. Готов к работе."
         else:
-            reply = f"📨 Ты написал: {text}"
+            reply = f"Ты написал: {text}"
 
         send_message(chat_id, reply)
 
-    return {"ok": True}, 200
+    return jsonify(ok=True), 200  # <-- ВАЖНО! Telegram ждет JSON
 
 def send_message(chat_id, text):
     url = f"{TELEGRAM_API_URL}/sendMessage"
@@ -36,5 +36,7 @@ def send_message(chat_id, text):
         "text": text
     }
     response = requests.post(url, json=payload)
-    print("📤 Отправка сообщения:", payload)
-    print("📡 Ответ Telegram:", response.status_code, response.text)
+    print("Sent message:", response.text)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
