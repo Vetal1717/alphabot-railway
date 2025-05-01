@@ -18,22 +18,32 @@ def webhook():
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
-        text = data["message"]["text"]
+        text = data["message"].get("text", "")
 
         if text == "/start":
             reply = "Привет! Я бот AlphaSignals. Готов к работе."
         else:
             reply = f"Ты написал: {text}"
 
-        send_message(chat_id, reply)
+        try:
+            send_message(chat_id, reply)
+        except Exception as e:
+            print("ERROR while sending message:", e)
 
     return {"ok": True}, 200
 
-def send_message(chat_id, text):
+def send_message(chat_id, reply):
     url = f"{TELEGRAM_API_URL}/sendMessage"
     payload = {
         "chat_id": chat_id,
-        "text": text
+        "text": reply
     }
+
     response = requests.post(url, json=payload)
+
+    # Выводим ответ от Telegram
     print("Sent message:", response.text)
+
+    # Если ошибка — выведи её
+    if response.status_code != 200:
+        print("Telegram API error:", response.status_code, response.text)
