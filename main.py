@@ -1,6 +1,6 @@
 import os
-from flask import Flask, request
 import requests
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -14,7 +14,7 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
-    print("Received:", data)
+    print("Получено:", data)
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
@@ -35,4 +35,8 @@ def send_message(chat_id, text):
         "chat_id": chat_id,
         "text": text
     }
-    requests.post(url, json=payload)
+    try:
+        response = requests.post(url, json=payload)
+        print("Ответ Telegram:", response.status_code, response.text)
+    except Exception as e:
+        print("Ошибка при отправке:", e)
