@@ -4,12 +4,12 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
+TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
+TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 @app.route("/", methods=["GET"])
-def index():
-    return "Bot is running", 200
+def home():
+    return "AlphaBot is live!", 200
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -27,10 +27,14 @@ def webhook():
 
         send_message(chat_id, reply)
 
-    return "ok", 200
+    return {"ok": True}, 200
 
 def send_message(chat_id, text):
-    url = f"{API_URL}/sendMessage"
-    payload = {"chat_id": chat_id, "text": text}
+    url = f"{TELEGRAM_API_URL}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text
+    }
     response = requests.post(url, json=payload)
     print("Sent message:", response.text)
+
