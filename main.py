@@ -1,10 +1,10 @@
 import os
 import requests
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")  # Убедись, что переменная BOT_TOKEN установлена в Railway
+TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 @app.route("/", methods=["GET"])
@@ -13,8 +13,8 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.json
-    print("Получено:", data)
+    data = request.get_json()
+    print("Received:", data)
 
     if "message" in data:
         chat_id = data["message"]["chat"]["id"]
@@ -27,7 +27,7 @@ def webhook():
 
         send_message(chat_id, reply)
 
-    return "OK", 200
+    return jsonify(ok=True), 200
 
 def send_message(chat_id, text):
     url = f"{TELEGRAM_API_URL}/sendMessage"
@@ -35,8 +35,6 @@ def send_message(chat_id, text):
         "chat_id": chat_id,
         "text": text
     }
-    try:
-        response = requests.post(url, json=payload)
-        print("Ответ Telegram:", response.status_code, response.text)
-    except Exception as e:
-        print("Ошибка при отправке:", e)
+    response = requests.post(url, json=payload)
+    print("Sent:", response.text)
+
